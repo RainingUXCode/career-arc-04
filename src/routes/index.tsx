@@ -1,4 +1,45 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+
+/* ---------- Animation hooks ---------- */
+function useInView<T extends HTMLElement>(threshold = 0.35) {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    if (!ref.current || inView) return;
+    const io = new IntersectionObserver(
+      ([e]) => e.isIntersecting && setInView(true),
+      { threshold },
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [inView, threshold]);
+  return [ref, inView] as const;
+}
+
+function useCountUp(target: number, active: boolean, duration = 1400, delay = 0) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    let start = 0;
+    const t0 = performance.now() + delay;
+    const tick = (t: number) => {
+      if (t < t0) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      if (!start) start = t;
+      const p = Math.min(1, (t - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, active, duration, delay]);
+  return n;
+}
 
 export const Route = createFileRoute("/")({
   component: Landing,
