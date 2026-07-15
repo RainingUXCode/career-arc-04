@@ -77,21 +77,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "CareerScore — Inteligência de carreira para profissionais de tecnologia" },
+      {
+        name: "description",
+        content:
+          "Descubra o que realmente está impedindo sua carreira de evoluir. Diagnóstico contínuo, plano de ação e currículo ATS.",
+      },
+      { name: "author", content: "CareerScore" },
+      { property: "og:title", content: "CareerScore — Inteligência de carreira" },
+      {
+        property: "og:description",
+        content:
+          "Pare de enviar currículos no escuro. Use dados para mapear lacunas, evoluir e conquistar vagas de alta senioridade.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "CareerScore — Inteligência de carreira" },
+      {
+        name: "twitter:description",
+        content:
+          "Diagnóstico contínuo, plano de ação e currículo ATS para profissionais que levam a carreira a sério.",
+      },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
