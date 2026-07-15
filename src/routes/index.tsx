@@ -72,13 +72,13 @@ function Nav() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="hidden sm:inline-flex text-[13px] text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md transition-colors">
+          <Link to="/auth" search={{ mode: "signin" }} className="hidden sm:inline-flex text-[13px] text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md transition-colors">
             Entrar
-          </button>
-          <button className="inline-flex items-center gap-2 text-[13px] font-medium bg-brand text-brand-foreground pl-3 pr-3.5 py-1.5 rounded-md ring-1 ring-inset ring-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_6px_16px_-6px_rgba(37,99,235,0.6)] hover:brightness-110 transition-all active:scale-[0.98]">
+          </Link>
+          <Link to="/auth" search={{ mode: "signup" }} className="inline-flex items-center gap-2 text-[13px] font-medium bg-brand text-brand-foreground pl-3 pr-3.5 py-1.5 rounded-md ring-1 ring-inset ring-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_6px_16px_-6px_rgba(37,99,235,0.6)] hover:brightness-110 transition-all active:scale-[0.98]">
             Começar diagnóstico
             <span aria-hidden className="text-white/60">→</span>
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
