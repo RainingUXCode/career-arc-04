@@ -144,44 +144,7 @@ function DashboardPreview() {
           </aside>
 
           {/* main */}
-          <div className="p-5 space-y-4 bg-background">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-                  Health Score
-                </div>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-[46px] leading-none font-semibold tracking-tight text-emerald">
-                    84
-                  </span>
-                  <span className="text-sm text-muted-foreground">/ 100</span>
-                  <span className="ml-1 text-[11px] font-mono text-emerald/90">+12 este mês</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-violet px-2 py-1 rounded-md bg-violet/10 ring-1 ring-violet/25">
-                <span className="size-1.5 rounded-full bg-violet" />
-                IA analisando
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <MetricBar label="Aderência ao mercado" value={72} tone="emerald" delta="+4%" />
-              <MetricBar label="Competitividade ATS" value={45} tone="amber" delta="Ajustar keywords" />
-              <MetricBar label="Senioridade projetada" value={88} tone="brand" delta="Senior · 14 meses" />
-            </div>
-
-            <div className="rounded-xl bg-card ring-1 ring-border/60 p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  Próximos passos
-                </span>
-                <span className="text-[10px] font-mono text-muted-foreground">3 de 7</span>
-              </div>
-              <StepRow color="brand" text="Atualizar certificação Cloud Practitioner" />
-              <StepRow color="amber" text="Reescrever bullet de liderança com métricas" />
-              <StepRow color="violet" text="Otimizar seção de skills para ATS Tier-1" muted />
-            </div>
-          </div>
+          <CareerScoreMain />
         </div>
       </div>
 
