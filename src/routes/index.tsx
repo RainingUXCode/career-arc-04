@@ -358,10 +358,10 @@ function Hero() {
           </p>
 
           <div className="mt-8 flex items-center gap-3">
-            <button className="inline-flex items-center gap-2 text-sm font-medium bg-brand text-brand-foreground px-4 py-2.5 rounded-lg ring-1 ring-inset ring-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_10px_28px_-10px_rgba(37,99,235,0.7)] hover:brightness-110 transition-all active:scale-[0.98]">
+            <Link to="/auth" search={{ mode: "signup" }} className="inline-flex items-center gap-2 text-sm font-medium bg-brand text-brand-foreground px-4 py-2.5 rounded-lg ring-1 ring-inset ring-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_10px_28px_-10px_rgba(37,99,235,0.7)] hover:brightness-110 transition-all active:scale-[0.98]">
               Começar diagnóstico gratuito
               <span aria-hidden className="text-white/70">→</span>
-            </button>
+            </Link>
             <button className="text-sm text-foreground/80 hover:text-foreground px-4 py-2.5 rounded-lg border border-border hover:bg-white/[0.03] transition-colors">
               Ver como funciona
             </button>
