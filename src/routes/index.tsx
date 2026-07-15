@@ -1,4 +1,45 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+
+/* ---------- Animation hooks ---------- */
+function useInView<T extends HTMLElement>(threshold = 0.35) {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    if (!ref.current || inView) return;
+    const io = new IntersectionObserver(
+      ([e]) => e.isIntersecting && setInView(true),
+      { threshold },
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [inView, threshold]);
+  return [ref, inView] as const;
+}
+
+function useCountUp(target: number, active: boolean, duration = 1400, delay = 0) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    let start = 0;
+    const t0 = performance.now() + delay;
+    const tick = (t: number) => {
+      if (t < t0) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      if (!start) start = t;
+      const p = Math.min(1, (t - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, active, duration, delay]);
+  return n;
+}
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -103,44 +144,7 @@ function DashboardPreview() {
           </aside>
 
           {/* main */}
-          <div className="p-5 space-y-4 bg-background">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-                  Health Score
-                </div>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-[46px] leading-none font-semibold tracking-tight text-emerald">
-                    84
-                  </span>
-                  <span className="text-sm text-muted-foreground">/ 100</span>
-                  <span className="ml-1 text-[11px] font-mono text-emerald/90">+12 este mês</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-violet px-2 py-1 rounded-md bg-violet/10 ring-1 ring-violet/25">
-                <span className="size-1.5 rounded-full bg-violet" />
-                IA analisando
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <MetricBar label="Aderência ao mercado" value={72} tone="emerald" delta="+4%" />
-              <MetricBar label="Competitividade ATS" value={45} tone="amber" delta="Ajustar keywords" />
-              <MetricBar label="Senioridade projetada" value={88} tone="brand" delta="Senior · 14 meses" />
-            </div>
-
-            <div className="rounded-xl bg-card ring-1 ring-border/60 p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  Próximos passos
-                </span>
-                <span className="text-[10px] font-mono text-muted-foreground">3 de 7</span>
-              </div>
-              <StepRow color="brand" text="Atualizar certificação Cloud Practitioner" />
-              <StepRow color="amber" text="Reescrever bullet de liderança com métricas" />
-              <StepRow color="violet" text="Otimizar seção de skills para ATS Tier-1" muted />
-            </div>
-          </div>
+          <CareerScoreMain />
         </div>
       </div>
 
@@ -174,16 +178,105 @@ function DashboardPreview() {
   );
 }
 
+function CareerScoreMain() {
+  const [ref, inView] = useInView<HTMLDivElement>(0.3);
+  // Loading → calculating → revealed
+  const [phase, setPhase] = useState<"loading" | "calculating" | "ready">("loading");
+
+  useEffect(() => {
+    if (!inView) return;
+    const t1 = setTimeout(() => setPhase("calculating"), 350);
+    const t2 = setTimeout(() => setPhase("ready"), 1100);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [inView]);
+
+  const score = useCountUp(84, phase === "ready", 1600);
+  const delta = useCountUp(12, phase === "ready", 1400, 200);
+
+  return (
+    <div ref={ref} className="p-5 space-y-4 bg-background">
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <span>Career Score</span>
+            {phase !== "ready" && (
+              <span className="inline-flex items-center gap-1 text-violet/90 normal-case tracking-normal">
+                <span className="size-1 rounded-full bg-violet animate-pulse-dot" />
+                <span className="text-[10px]">recalculando…</span>
+              </span>
+            )}
+          </div>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span
+              className={`text-[46px] leading-none font-semibold tracking-tight tabular-nums transition-colors duration-500 ${
+                phase === "ready" ? "text-emerald" : "text-muted-foreground/40"
+              }`}
+            >
+              {phase === "loading" ? "—" : score}
+            </span>
+            <span className="text-sm text-muted-foreground">/ 100</span>
+            <span
+              className={`ml-1 text-[11px] font-mono tabular-nums transition-opacity duration-500 ${
+                phase === "ready" ? "opacity-100 text-emerald/90" : "opacity-0"
+              }`}
+            >
+              +{delta} este mês
+            </span>
+          </div>
+          {/* thin progress track under the score */}
+          <div className="mt-3 h-[3px] w-56 rounded-full bg-elevated overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-[width,background-color] duration-[1400ms] ease-out ${
+                phase === "ready" ? "bg-emerald" : "bg-violet/60"
+              }`}
+              style={{ width: phase === "loading" ? "0%" : phase === "calculating" ? "40%" : "84%" }}
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-violet px-2 py-1 rounded-md bg-violet/10 ring-1 ring-violet/25">
+          <span className="size-1.5 rounded-full bg-violet animate-pulse-dot" />
+          IA analisando
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <MetricBar label="Aderência ao mercado" value={72} tone="emerald" delta="+4%" active={phase === "ready"} delay={100} />
+        <MetricBar label="Competitividade ATS" value={45} tone="amber" delta="Ajustar keywords" active={phase === "ready"} delay={220} />
+        <MetricBar label="Senioridade projetada" value={88} tone="brand" delta="Senior · 14 meses" active={phase === "ready"} delay={340} />
+      </div>
+
+      <div className="rounded-xl bg-card ring-1 ring-border/60 p-4 space-y-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Próximos passos
+          </span>
+          <span className="text-[10px] font-mono text-muted-foreground tabular-nums">3 de 7</span>
+        </div>
+        <StepRow color="brand" text="Atualizar certificação Cloud Practitioner" />
+        <StepRow color="amber" text="Reescrever bullet de liderança com métricas" />
+        <StepRow color="violet" text="Otimizar seção de skills para ATS Tier-1" muted />
+      </div>
+    </div>
+  );
+}
+
 function MetricBar({
   label,
   value,
   tone,
   delta,
+  active = true,
+  delay = 0,
 }: {
   label: string;
   value: number;
   tone: "emerald" | "amber" | "brand" | "violet";
   delta: string;
+  active?: boolean;
+  delay?: number;
 }) {
   const barColor = {
     emerald: "bg-emerald",
@@ -200,10 +293,21 @@ function MetricBar({
   return (
     <div className="rounded-xl bg-card ring-1 ring-border/60 p-3.5 space-y-2.5">
       <div className="text-[10.5px] text-muted-foreground">{label}</div>
-      <div className="h-1 rounded-full bg-elevated overflow-hidden">
-        <div className={`h-full ${barColor}`} style={{ width: `${value}%` }} />
+      <div className="h-1 rounded-full bg-elevated overflow-hidden relative">
+        <div
+          className={`h-full ${barColor} transition-[width] duration-[1200ms] ease-out`}
+          style={{ width: active ? `${value}%` : "0%", transitionDelay: `${delay}ms` }}
+        />
+        {!active && (
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent animate-shimmer" />
+        )}
       </div>
-      <div className={`text-[10px] font-mono ${textColor}`}>{delta}</div>
+      <div
+        className={`text-[10px] font-mono ${textColor} transition-opacity duration-500`}
+        style={{ opacity: active ? 1 : 0, transitionDelay: `${delay + 200}ms` }}
+      >
+        {delta}
+      </div>
     </div>
   );
 }
@@ -376,7 +480,7 @@ function Solution() {
               {
                 step: "Passo 1",
                 title: "Diagnóstico contínuo",
-                text: "Analisamos seu perfil contra milhares de sinais de mercado em tempo real e traduzimos em um Health Score.",
+                text: "Analisamos seu perfil contra milhares de sinais de mercado em tempo real e traduzimos em um Career Score.",
                 color: "emerald",
               },
               {
@@ -841,7 +945,7 @@ function CTA() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button className="inline-flex items-center gap-2 text-sm font-medium bg-brand text-brand-foreground px-5 py-3 rounded-lg ring-1 ring-inset ring-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_10px_28px_-10px_rgba(37,99,235,0.7)] hover:brightness-110 transition-all active:scale-[0.98]">
-              Criar meu Health Score
+              Criar meu Career Score
               <span aria-hidden className="text-white/70">→</span>
             </button>
             <button className="text-sm text-foreground/85 hover:text-foreground px-5 py-3 rounded-lg border border-border hover:bg-white/[0.03] transition-colors">
