@@ -372,7 +372,7 @@ function Solution() {
         <div className="mt-16 grid lg:grid-cols-[1.15fr_1fr] gap-10 items-start">
           {/* left: numbered flow */}
           <div className="space-y-6">
-            {[
+            {([
               {
                 step: "Passo 1",
                 title: "Diagnóstico contínuo",
@@ -397,7 +397,7 @@ function Solution() {
                 text: "Gera currículos otimizados para ATS, recebe vagas de fato compatíveis e acompanha o quanto você evoluiu.",
                 color: "violet",
               },
-            ].map((s) => (
+            ] as const).map((s) => (
               <FlowRow key={s.step} {...s} />
             ))}
           </div>
