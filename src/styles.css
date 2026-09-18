@@ -42,6 +42,8 @@
   --color-violet: var(--violet);
   --color-amber: var(--amber);
   --color-danger: var(--danger);
+  --color-surface: var(--card);
+  --color-surface-2: var(--elevated);
 
   --color-destructive: var(--danger);
   --color-destructive-foreground: var(--brand-foreground);
