@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: DiagnosticPage;
+  component: DiagnosticPage,
 });
 
 function useCountUp(target: number, active: boolean, duration = 1400, delay = 0) {
