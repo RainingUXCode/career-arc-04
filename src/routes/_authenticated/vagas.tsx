@@ -38,11 +38,16 @@ function JobsPage() {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      const query = targetRole.toLowerCase();
+      const wanted = skills
+        .split(",")
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
       setJobs(
-        mockJobs.filter(
-          (job) => !query || job.job_title.toLowerCase().includes(query.split(" ")[0] ?? "") || true,
-        ),
+        wanted.length === 0
+          ? mockJobs
+          : mockJobs.filter((job) =>
+              job.job_required_skills.some((s) => wanted.includes(s.toLowerCase())),
+            ),
       );
       setLoading(false);
     }, 1200);
